@@ -2,3 +2,5 @@
 /.venv/
 *.log
 *.tmp
+__pycache__/
+.idea
