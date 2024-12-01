@@ -1,6 +1,9 @@
 import sqlite3
 from typing import List
 import datetime
+
+import typer
+
 from models import Task
 from models import Priority
 
@@ -14,12 +17,12 @@ def create_table():
     cur.execute("""
         CREATE TABLE IF NOT EXISTS tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT,
-            description TEXT,
-            category TEXT,
+            title TEXT NOT NULL,
+            description TEXT NOT NULL,
+            category TEXT NOT NULL,
             due_date INTEGER,
             priority TEXT,
-            status TEXT
+            status TEXT NOT NULL
         )
     """)
 
@@ -30,7 +33,7 @@ create_table()
 def insert_task(task: Task):
     """Вставляет задачу в таблицу task."""
     with conn:
-        cur.execute("""
+        cur.execute(""" 
             INSERT INTO tasks (title, description, category, due_date, priority, status) 
             VALUES (:title, :description, :category, :due_date, :priority, :status)
         """, {
@@ -38,7 +41,7 @@ def insert_task(task: Task):
             'description': task.description,
             'category': task.category,
             'due_date': task.due_date,
-            'priority': task.priority,
+            'priority': task.priority.value,
             'status': task.status
         })
 
@@ -49,12 +52,14 @@ def get_tasks() -> List[Task]:
     results = cur.fetchall()
     tasks = []
     for result in results:
-        title = result["title"]
-        description = result["description"]
-        category = result["category"]
-        priority = result["priority"]
-        status = result["status"]
-        task = Task(title=title, description=description, category=category, priority=priority, status=status)
+        task = Task(
+            title=result["title"],
+            description=result["description"],
+            category=result["category"],
+            due_date=result["due_date"],
+            priority=result["priority"],
+            status=result["status"]
+        )
         tasks.append(task)
     return tasks
 
@@ -83,35 +88,34 @@ def search_tasks(keyword: str) -> List[Task]:
 
 
 def delete_task(task_id: int = None, category: str = None):
-    """Удаляет задачу из таблицы task по id или категории."""
-    query = "DELETE FROM task WHERE"
-    params = []
+    """
+    Удаляет задачи на основе переданных критериев.
+
+    :param task_id: ID задачи (если указан).
+    :param category: Категория задачи (если указана).
+    """
+    if task_id is None and category is None:
+        raise ValueError("Необходимо указать task_id или category.")
 
     if task_id:
-        query += " id = ?"
-        params.append(task_id)
-
+        cur.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
     if category:
-        if params:
-            query += " OR"
-        query += " category = ?"
-        params.append(category)
-
-    with conn:
-        cur.execute(query, tuple(params))
+        cur.execute("DELETE FROM tasks WHERE category = ?", (category,))
+    conn.commit()
 
 
-def update_task(id: int, **fields):
+def update_task(task_id: int, **fields):
     """Позволяет редактировать задачу."""
     fields = {k: v for k, v in fields.items() if v is not None}
     set_clause = ", ".join(f"{key} = :{key}" for key in fields.keys())
-    fields["id"] = id
+    fields["id"] = task_id
 
     with conn:
         cur.execute(
             f"UPDATE tasks SET {set_clause} WHERE id = :id",
             fields
         )
+
 
 
 def complete_task(id: int):
