@@ -1,2 +1,4 @@
 /Tasks.db
 /.venv/
+*.log
+*.tmp
