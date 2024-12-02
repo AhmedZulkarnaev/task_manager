@@ -40,7 +40,7 @@ def update(
     title: Optional[str] = None,
     description: Optional[str] = None,
     due_date: Optional[str] = None,
-    status: Optional[int] = None
+    status: Optional[str] = None
 ):
     """Команда для редактирования задачи"""
     update_task(
@@ -54,8 +54,8 @@ def update(
 
 
 @app.command(short_help="Вывод таблицы с задачами")
-def show():
-    tasks = get_tasks()
+def show(category: Optional[str] = None, status: Optional[str] = None):
+    tasks = get_tasks(category=category, status=status)
     console.print("[bold magenta]TaskManager[/bold magenta]")
 
     table = Table(show_header=True, header_style="bold blue")
@@ -73,7 +73,6 @@ def show():
 
     for idx, task in enumerate(tasks, start=1):
         c = get_category_color(task.category)
-        is_done_str = "Выполнено" if task.status == "2" else "Не выполнено"
         table.add_row(
             str(idx),
             task.title,
@@ -81,7 +80,7 @@ def show():
             f'[{c}]{task.category}[/{c}]',
             str(task.due_date),
             task.priority,
-            is_done_str,
+            task.status,
         )
     console.print(table)
 

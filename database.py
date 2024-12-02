@@ -46,9 +46,22 @@ def insert_task(task: Task):
         })
 
 
-def get_tasks() -> List[Task]:
-    """Получает все задачи из таблицы task."""
-    cur.execute("SELECT * FROM tasks")
+def get_tasks(category: str = None, status: str = None) -> List[Task]:
+    """Получает задачи по категории или статусу, если указано."""
+    query = "SELECT * FROM tasks"
+    parameters = {}
+
+    if category and status:
+        query += " WHERE category = :category AND status = :status"
+        parameters = {'category': category, 'status': status}
+    elif category:
+        query += " WHERE category = :category"
+        parameters = {'category': category}
+    elif status:
+        query += " WHERE status = :status"
+        parameters = {'status': status}
+
+    cur.execute(query, parameters)
     results = cur.fetchall()
     tasks = []
     for result in results:
@@ -62,6 +75,7 @@ def get_tasks() -> List[Task]:
         )
         tasks.append(task)
     return tasks
+
 
 
 def get_tasks_by_category(category: str) -> List[Task]:
@@ -116,12 +130,3 @@ def update_task(task_id: int, **fields):
             fields
         )
 
-
-
-def complete_task(id: int):
-    """Помечает задачу как выполненную."""
-    with conn:
-        cur.execute(
-            'UPDATE tasks SET status = "Выполнено", due_date = :due_date WHERE id = :id',
-            {'id': id, 'due_date': datetime.datetime.now().isoformat()}
-        )

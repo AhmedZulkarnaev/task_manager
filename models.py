@@ -1,4 +1,5 @@
 import datetime
+import uuid
 from enum import Enum
 
 
@@ -9,7 +10,8 @@ class Priority(Enum):
 
 
 class Task:
-    def __init__(self, title, description, category, priority: Priority, status=1, due_date=None):
+    def __init__(self, title, description, category, priority: Priority, status="Не выполнена", due_date=None):
+        self.id = id
         self.title = title
         self.description = description
         self.category = category
@@ -18,11 +20,10 @@ class Task:
         self.due_date = due_date if due_date else "Нет информации"
 
     def __repr__(self) -> str:
-        status_str = 'Выполнена' if self.status == 2 else 'Не выполнена'
         return (f"Информация о задаче:\n"
                 f"Название: {self.title}\n"
                 f"Описание: {self.description}\n"
                 f"Категория: {self.category}\n"
                 f"Срок выполнения: {self.due_date}\n"
                 f"Приоритет: {self.priority.value}\n"
-                f"Статус: {status_str}\n")
+                f"Статус: {self.status}\n")
