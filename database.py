@@ -42,7 +42,7 @@ def insert_task(task: Task):
         })
 
 
-def get_tasks(category: str = None, status: str = None) -> List[Task]:
+def get_tasks(category: str = None, status: str = None, keyword: str = None) -> List[Task]:
     """Получает задачи по категории или статусу, если указано."""
     query = "SELECT * FROM tasks"
     parameters = {}
@@ -56,6 +56,9 @@ def get_tasks(category: str = None, status: str = None) -> List[Task]:
     elif status:
         query += " WHERE status = :status"
         parameters = {'status': status}
+    elif keyword:
+        query += " WHERE title = :keyword"
+        parameters = {'keyword': keyword}
 
     cur.execute(query, parameters)
     results = cur.fetchall()
@@ -71,30 +74,6 @@ def get_tasks(category: str = None, status: str = None) -> List[Task]:
         )
         tasks.append(task)
     return tasks
-
-
-
-def get_tasks_by_category(category: str) -> List[Task]:
-    """Поиск по категории."""
-    cur.execute("SELECT * FROM tasks WHERE category = ?", (category,))
-    results = cur.fetchall()
-    return [Task(*result) for result in results]
-
-
-def get_tasks_by_status(status: str) -> List[Task]:
-    """Поиск по статусу."""
-    cur.execute("SELECT * FROM tasks WHERE status = ?", (status,))
-    results = cur.fetchall()
-    return [Task(*result) for result in results]
-
-
-def search_tasks(keyword: str) -> List[Task]:
-    """Поиск по ключевым словам."""
-    cur.execute(
-        "SELECT * FROM tasks WHERE title LIKE ?", f"%{keyword}%"
-    )
-    results = cur.fetchall()
-    return [Task(*result) for result in results]
 
 
 def delete_task(task_id: int = None, category: str = None):

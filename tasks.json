@@ -1,17 +1,8 @@
 [
     {
         "id": 1,
-        "title": "test 1",
+        "title": "car",
         "description": "desc test 1",
-        "category": "Личное",
-        "due_date": "Нет информации",
-        "priority": "высокий",
-        "status": "Не выполнена"
-    },
-    {
-        "id": 2,
-        "title": "test 2",
-        "description": "desc test 2",
         "category": "Личное",
         "due_date": "Нет информации",
         "priority": "высокий",

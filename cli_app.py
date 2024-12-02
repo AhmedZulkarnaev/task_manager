@@ -4,7 +4,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 from database import insert_task, get_tasks, delete_task, update_task
-from models import Priority
+from models import Priority, Task
 
 from save_data import save_tasks_to_json
 from validators import date_type
@@ -71,8 +71,12 @@ def update(
 
 
 @app.command(short_help="Вывод таблицы с задачами")
-def show(category: Optional[str] = None, status: Optional[str] = None):
-    tasks = get_tasks(category=category, status=status)
+def show(
+        category: Optional[str] = None,
+        status: Optional[str] = None,
+        keyword: Optional[str] = None
+):
+    tasks = get_tasks(category=category, status=status, keyword=keyword)
     console.print("[bold magenta]TaskManager[/bold magenta]")
 
     table = Table(show_header=True, header_style="bold blue")
