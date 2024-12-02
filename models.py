@@ -1,5 +1,3 @@
-import datetime
-import uuid
 from enum import Enum
 
 
@@ -11,7 +9,6 @@ class Priority(Enum):
 
 class Task:
     def __init__(self, title, description, category, priority: Priority, status="Не выполнена", due_date=None):
-        self.id = id
         self.title = title
         self.description = description
         self.category = category

@@ -1,52 +1,23 @@
 import json
 from typing import List
 
-from models import Task, Priority
-from database import get_tasks
-
-tasks = get_tasks()
+from models import Task
 
 
-class TaskEncoder(json.JSONEncoder):
-    """Кастомный JSON-энкодер для сериализации объектов Task."""
-    def default(self, obj):
-        if isinstance(obj, Task):
-            return {
-                "id": obj.id,
-                "title": obj.title,
-                "description": obj.description,
-                "category": obj.category,
-                "due_date": obj.due_date,
-                "priority": obj.priority,
-                "status": obj.status,
-            }
-        return super().default(obj)
-
-
-def save_tasks_to_json(tasks: List[Task], filename: str) -> None:
+def save_tasks_to_json(tasks: List[Task], file_path: str):
     """Сохраняет задачи в файл JSON."""
-    with open(filename, "w", encoding="utf-8") as f:
-        json.dump(tasks, f, ensure_ascii=False, indent=4, cls=TaskEncoder)
+    with open(file_path, "w", encoding="utf-8") as file:
+        tasks_list = []
+        for i, task in enumerate(tasks, start=1):
+            task_dict = {
+                "id": i,
+                "title": task.title,
+                "description": task.description,
+                "category": task.category,
+                "due_date": task.due_date,
+                "priority": task.priority,
+                "status": task.status
+            }
+            tasks_list.append(task_dict)
+        json.dump(tasks_list, file, ensure_ascii=False, indent=4)
 
-
-def load_tasks_from_json(filename: str) -> List[Task]:
-    """Загружает задачи из файла JSON."""
-    with open(filename, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    return [
-        Task(
-            id=item["id"],
-            title=item["title"],
-            description=item["description"],
-            category=item["category"],
-            priority=Priority(item["priority"]),
-            status=item["status"],
-            due_date=item.get("due_date"),
-        )
-        for item in data
-    ]
-
-
-save_tasks_to_json(tasks, "tasks.json")
-
-loaded_tasks = load_tasks_from_json("tasks.json")

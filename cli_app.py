@@ -1,11 +1,13 @@
+from typing import Optional
+
 import typer
 from rich.console import Console
 from rich.table import Table
-from models import Task, Priority
 from database import insert_task, get_tasks, delete_task, update_task
-from typing import Optional
+from models import Priority
 
-from test import date_type
+from save_data import save_tasks_to_json
+from validators import date_type
 
 console = Console()
 app = typer.Typer()
@@ -19,8 +21,13 @@ def add(
         due_date: Optional[str] = None,
         priority: Priority = "средний"):
     """Добавление новой задачи."""
+    if not title or not description or not category:
+        typer.echo("Ошибка: Название, описание и категория не могут быть пустыми.")
+        raise typer.Exit(code=1)
+
     if due_date:
-        due_date = date_type(due_date)
+        date_type(due_date)
+
     typer.echo(f"Добавление задачи: {title}, {description}, {category}, {priority.value}")
     task = Task(title, description, category, priority, due_date=due_date)
     insert_task(task)
@@ -30,19 +37,29 @@ def add(
 @app.command(short_help="Удаление задачи")
 def delete(task_id: Optional[int] = None, category: Optional[str] = None):
     """Удаляет задачи."""
+    if task_id is None and category is None:
+        typer.echo("Ошибка: Необходимо указать task_id или category для удаления задачи.")
+        raise typer.Exit(code=1)
     delete_task(task_id, category)
     show()
 
 
 @app.command(short_help="Редактирование задачи")
 def update(
-    task_id: int,
-    title: Optional[str] = None,
-    description: Optional[str] = None,
-    due_date: Optional[str] = None,
-    status: Optional[str] = None
+        task_id: int,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        due_date: Optional[str] = None,
+        status: Optional[str] = None
 ):
     """Команда для редактирования задачи"""
+    if due_date:
+        date_type(due_date)
+
+    if status and status not in ["Не выполнена", "В процессе", "Выполнена"]:
+        typer.echo("Недопустимый статус. Допустимые значения: 'Не выполнена', 'В процессе', 'Выполнена'.")
+        raise typer.Exit(code=1)
+
     update_task(
         task_id,
         title=title,
@@ -83,6 +100,7 @@ def show(category: Optional[str] = None, status: Optional[str] = None):
             task.status,
         )
     console.print(table)
+    save_tasks_to_json(tasks, "tasks.json")
 
 
 if __name__ == "__main__":

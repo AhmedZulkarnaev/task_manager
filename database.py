@@ -1,11 +1,7 @@
 import sqlite3
 from typing import List
-import datetime
-
-import typer
 
 from models import Task
-from models import Priority
 
 conn = sqlite3.connect('Tasks.db')
 conn.row_factory = sqlite3.Row
@@ -129,4 +125,3 @@ def update_task(task_id: int, **fields):
             f"UPDATE tasks SET {set_clause} WHERE id = :id",
             fields
         )
-

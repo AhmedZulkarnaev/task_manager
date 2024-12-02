@@ -1,19 +1,19 @@
 [
     {
         "id": 1,
-        "title": "Новая задача",
-        "description": "Описание задачи",
-        "category": "Учеба",
-        "due_date": "2025-05-12",
+        "title": "test 1",
+        "description": "desc test 1",
+        "category": "Личное",
+        "due_date": "Нет информации",
         "priority": "высокий",
-        "status": "Выполнена"
+        "status": "Не выполнена"
     },
     {
         "id": 2,
-        "title": "Новая задача",
-        "description": "Описание задачи",
-        "category": "Учеба",
-        "due_date": "2025-05-12",
+        "title": "test 2",
+        "description": "desc test 2",
+        "category": "Личное",
+        "due_date": "Нет информации",
         "priority": "высокий",
         "status": "Не выполнена"
     }
